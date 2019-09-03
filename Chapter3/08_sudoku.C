@@ -1,6 +1,9 @@
-#include "04_sudoku.h"
+#include "08_sudoku.h"
 
 #include <stdexcept>
+#include <cstring>
+#include <istream>
+#include <ostream>
 
 Sudoku::Sudoku()
 {
@@ -9,6 +12,12 @@ Sudoku::Sudoku()
             cells[i][j] = 0;
         }
     }
+}
+
+Sudoku::Sudoku(const Sudoku& S, size_t i, size_t j, unsigned char value)
+    : Sudoku(S)
+{
+    set(i, j, value);
 }
 
 unsigned char Sudoku::get(size_t i, size_t j) const
@@ -50,5 +59,35 @@ void Sudoku::set(size_t i, size_t j, unsigned char value)
     if (i >= 9 || j >= 9) throw std::logic_error("Invalid index");
     if (cells[i][j] != 0) throw std::logic_error("Reinitialization");
     if (value == 0 || value > 9) throw std::logic_error("Invalid value");
+    if ((get_mask(i, j) & masks[value]) == 0) throw std::logic_error("Forbidden value");
     cells[i][j] = value;
+}
+
+std::ostream& operator<<(std::ostream& out, const Sudoku& S)
+{
+    for (size_t i = 0; i < 9; ++i) {
+        for (size_t j = 0; j < 9; ++j) {
+            if (S.cells[i][j]) out << static_cast<int>(S.cells[i][j]);
+            else out << '.';
+        }
+        out << std::endl;
+    }
+    return out;
+}
+
+std::istream& operator>>(std::istream& in, Sudoku& S)
+{
+    for (size_t i = 0; i < 9; ++i) {
+        for (size_t j = 0; j < 9; ++j) {
+            S.cells[i][j] = 0;
+        }
+    }
+    for (size_t i = 0; i < 9; ++i) {
+        for (size_t j = 0; j < 9; ++j) {
+            char c;
+            in >> c;
+            if (c != '.') S.set(i, j, c - '0');
+        }
+    }
+    return in;
 }

@@ -1,4 +1,4 @@
-#include "04_sudoku.h"
+#include "05_sudoku.h"
 
 #include <stdexcept>
 
@@ -50,5 +50,6 @@ void Sudoku::set(size_t i, size_t j, unsigned char value)
     if (i >= 9 || j >= 9) throw std::logic_error("Invalid index");
     if (cells[i][j] != 0) throw std::logic_error("Reinitialization");
     if (value == 0 || value > 9) throw std::logic_error("Invalid value");
+    if ((get_mask(i, j) & masks[value]) == 0) throw std::logic_error("Forbidden value");
     cells[i][j] = value;
 }
